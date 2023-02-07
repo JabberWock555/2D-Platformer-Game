@@ -4,23 +4,34 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+
     public Animator animator;
-    public BoxCollider2D Collider;
+    private BoxCollider2D Collider;
+    private Rigidbody2D Body;
     public float speed;
-    void Start()
+    public float jump;
+    private float horizontal;
+    private float vertical;
+    private bool IsGrounded;
+    void Awake()
     {
-        Collider = Collider.GetComponent<BoxCollider2D>();
+        Collider = gameObject.GetComponent<BoxCollider2D>();
+        Body = gameObject.GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
-    private void Update()
+     void Update()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+         horizontal = Input.GetAxisRaw("Horizontal");
+         vertical = Input.GetAxisRaw("Vertical");
         PlayMovementAnimation(horizontal, vertical);
-        MoveCharacter(horizontal);
+        MoveCharacter(horizontal, vertical);
     }
 
+     void FixedUpdate()
+    {
+        
+    }
     private void PlayMovementAnimation(float horizontal, float vertical)
     {
         animator.SetFloat("Speed", Mathf.Abs(horizontal));
@@ -42,7 +53,7 @@ public class PlayerController : MonoBehaviour
         if (vertical > 0)
         {
             animator.SetBool("Jump", true);
-            vertical = 0;
+            
         }
         else { animator.SetBool("Jump", false); }
 
@@ -62,10 +73,32 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void MoveCharacter(float horizontal)
+    private void MoveCharacter(float horizontal, float vertical)
     {
+        //Horizontal Movement
         Vector3 position = transform.position;
         position.x += horizontal * speed * Time.deltaTime;
         transform.position = position;
+
+        //Jump
+        if(IsGrounded && vertical > 0.1f)
+        {
+            Body.AddForce(new Vector2(0, jump), ForceMode2D.Force);
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if( collision.gameObject.tag == "Platform")
+        {
+            IsGrounded = true;
+        }
+    }
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Platform")
+        {
+            IsGrounded = false;
+        }
     }
 }
