@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,14 +14,22 @@ public class PlayerController : MonoBehaviour
     private float horizontal;
     private float vertical;
     private bool IsGrounded;
+    private int score;
     void Awake()
     {
         Collider = gameObject.GetComponent<BoxCollider2D>();
         Body = gameObject.GetComponent<Rigidbody2D>();
     }
 
+    public void Pickup_Key()
+    {
+        score += 10;
+        Debug.Log("Picked up a Key!");
+        Debug.Log("Score:" + score);
+    }
+
     // Update is called once per frame
-     void Update()
+    void Update()
     {
          horizontal = Input.GetAxisRaw("Horizontal");
          vertical = Input.GetAxisRaw("Vertical");
@@ -29,6 +38,11 @@ public class PlayerController : MonoBehaviour
         // Death Condition
         if(transform.position.y < -10f)
         { Death();}
+
+        if(score == 50)
+        {
+            Debug.Log("You Won");
+        }
     }
 
     
@@ -103,10 +117,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    //Death Function
     private void Death()
     {
         Debug.Log("You Died!");
         Vector2 startLocation = LevelStart.transform.position;
         transform.position = startLocation;
     }
+
+    
 }
