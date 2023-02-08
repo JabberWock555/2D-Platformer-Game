@@ -10,6 +10,6 @@ public class Death : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log("OOPS! Try Again");
-        Player.gameObject.transform.position = LevelStart.gameObject.transform.position;
+        Player.transform.position = LevelStart.transform.position;
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-
+    public GameObject LevelStart;
     public Animator animator;
     private BoxCollider2D Collider;
     private Rigidbody2D Body;
@@ -26,6 +26,9 @@ public class PlayerController : MonoBehaviour
          vertical = Input.GetAxisRaw("Vertical");
         PlayMovementAnimation(horizontal, vertical);
         MoveCharacter(horizontal, vertical);
+        // Death Condition
+        if(transform.position.y < -10f)
+        { Death();}
     }
 
     
@@ -98,5 +101,12 @@ public class PlayerController : MonoBehaviour
         {
             IsGrounded = false;
         }
+    }
+
+    private void Death()
+    {
+        Debug.Log("You Died!");
+        Vector2 startLocation = LevelStart.transform.position;
+        transform.position = startLocation;
     }
 }

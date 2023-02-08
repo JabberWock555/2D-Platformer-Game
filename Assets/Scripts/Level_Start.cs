@@ -8,19 +8,11 @@ public class Level_Start : MonoBehaviour
 
     private void Awake()
     {
-        PlayerReset();
+        Player.transform.position = transform.position;
     }
 
-    void OnTriggerExit2D(Collider2D collision)
+    private void OnTriggerExit2D(Collider2D collision)
     {
-        if (Player.gameObject.GetComponent<PlayerController>() != null)
-        {
-            Debug.Log("Level start");
-        }
-    }
-
-    public void PlayerReset()
-    {
-        Player.gameObject.transform.position = transform.position;
+        Debug.Log("Level start");
     }
 }
