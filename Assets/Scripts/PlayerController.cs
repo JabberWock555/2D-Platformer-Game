@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     private float horizontal;
     private float vertical;
     private bool IsGrounded;
-    private int score;
+    
     void Awake()
     {
         Collider = gameObject.GetComponent<BoxCollider2D>();
@@ -23,9 +23,8 @@ public class PlayerController : MonoBehaviour
 
     public void Pickup_Key()
     {
-        score += 10;
+        ScoreDisplay.ScoreValue += 10;
         Debug.Log("Picked up a Key!");
-        Debug.Log("Score:" + score);
     }
 
     // Update is called once per frame
@@ -39,7 +38,7 @@ public class PlayerController : MonoBehaviour
         if(transform.position.y < -10f)
         { Death();}
 
-        if(score == 50)
+        if(ScoreDisplay.ScoreValue == 50)
         {
             Debug.Log("You Won");
         }
