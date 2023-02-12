@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public GameObject LevelStart;
-    public Animator animator;
+    private Animator animator;
     private BoxCollider2D Collider;
     private Rigidbody2D Body;
     public float speed;
@@ -17,15 +17,11 @@ public class PlayerController : MonoBehaviour
     
     void Awake()
     {
-        Collider = gameObject.GetComponent<BoxCollider2D>();
-        Body = gameObject.GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        Collider = GetComponent<BoxCollider2D>();
+        Body = GetComponent<Rigidbody2D>();
     }
 
-    public void Pickup_Key()
-    {
-        ScoreDisplay.ScoreValue += 10;
-        Debug.Log("Picked up a Key!");
-    }
 
     // Update is called once per frame
     void Update()
@@ -44,13 +40,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    
+
     private void PlayMovementAnimation(float horizontal, float vertical)
     {
+        //Run Animation and Flip
         animator.SetFloat("Speed", Mathf.Abs(horizontal));
         Vector3 scale = transform.localScale;
 
-        //Run
         if (horizontal < 0 && IsGrounded)
         {
             scale.x = -1f * Mathf.Abs(scale.x);
@@ -62,28 +58,26 @@ public class PlayerController : MonoBehaviour
         }
         transform.localScale = scale;
 
-        //Jump
+        //Jump Animation
         if (vertical > 0 )
         {
             animator.SetBool("Jump", true);
-            
         }
-        else { animator.SetBool("Jump", false); }
+        else
+        {
+            animator.SetBool("Jump", false);
+        }
 
-        //crouch
+        //crouch Animation
         if (Input.GetKeyDown("left ctrl"))
         {
             animator.SetBool("Crouch", true);
-            Collider.size = new Vector2(0.6f, 1.2f);
-            Collider.offset = new Vector2(-0.05f, 0.6f);
-
         }
         else if (Input.GetKeyUp("left ctrl"))
         {
             animator.SetBool("Crouch", false);
-            Collider.size = new Vector2(0.6f, 2f);
-            Collider.offset = new Vector2(0.05f, 0.97f);
         }
+
     }
 
     private void MoveCharacter(float horizontal, float vertical)
@@ -101,16 +95,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    //GroundCheck
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Platform")) 
+        if (collision.gameObject.CompareTag("Ground")) 
         {
             IsGrounded = true;
         }
     }
     void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Platform"))
+        if (collision.gameObject.CompareTag("Ground"))
         {
             IsGrounded = false;
         }
@@ -124,5 +119,17 @@ public class PlayerController : MonoBehaviour
         transform.position = startLocation;
     }
 
-    
+    //
+    public void Pickup_Key()
+    {
+        ScoreDisplay.ScoreValue += 10;
+        Debug.Log("Picked up a Key!");
+    }
+
+    public void KillPlayer()
+    {
+        animator.SetBool("Dead", true);
+        Death();
+    }
+
 }

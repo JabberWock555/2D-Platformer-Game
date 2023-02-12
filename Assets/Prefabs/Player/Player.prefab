@@ -254,7 +254,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LevelStart: {fileID: 0}
-  animator: {fileID: 4090667726393500891}
   speed: 8
   jump: 60
 --- !u!70 &1808920245
