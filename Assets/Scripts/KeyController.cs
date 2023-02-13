@@ -9,10 +9,9 @@ public class KeyController : MonoBehaviour
     {
         animator = gameObject.GetComponent<Animator>();
     }
-    
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.GetComponent<PlayerController>() != null)
+        if (collision.gameObject.GetComponent<PlayerController>() != null)
         {
             PlayerController playerController = collision.gameObject.GetComponent<PlayerController>();
             playerController.Pickup_Key();
@@ -25,5 +24,5 @@ public class KeyController : MonoBehaviour
     {
         yield return new WaitForSeconds(0.4f);
         Destroy(gameObject);
+        }
     }
-}

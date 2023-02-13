@@ -16,6 +16,39 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
+        EnemyMovement();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.GetComponent<PlayerController>() != null)
+        {
+            PlayerController playerController = collision.gameObject.GetComponent<PlayerController>();
+            Transform PlayerPosition = collision.gameObject.transform;
+            transform.localScale = new Vector2(-Mathf.Sign(PlayerPosition.localScale.x), PlayerPosition.localScale.y);
+            animator.SetBool("Attack",true);
+            EnemyBody.velocity = new Vector2(0, 0);
+            playerController.DamagePlayer();
+        }
+        
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        animator.SetBool("Attack", false);
+        EnemyMovement();
+    }
+
+    private void OnTriggerExit2D(Collider2D collider2D)
+    {
+        if (collider2D.gameObject.CompareTag("Ground"))
+        { 
+            transform.localScale = new Vector2(-Mathf.Sign(transform.localScale.x), transform.localScale.y);
+        }
+    }
+
+    private void EnemyMovement()
+    {
         if (IsFacingRight())
         {
             EnemyBody.velocity = new Vector2(Speed, 0f);
@@ -23,28 +56,6 @@ public class EnemyController : MonoBehaviour
         else
         {
             EnemyBody.velocity = new Vector2(-Speed, 0f);
-        }
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.GetComponent<PlayerController>() != null)
-        {
-            //PlayerController playerController = collision.gameObject.GetComponent<PlayerController>();
-            Transform PlayerPosition = collision.gameObject.transform;
-            transform.localScale = new Vector2(-Mathf.Sign(PlayerPosition.localScale.x), PlayerPosition.localScale.y);
-            animator.SetTrigger("Attack");
-            //EnemyBody.velocity = new Vector2(0, 0f);
-           // playerController.KillPlayer();
-        }
-    }
-
-
-    private void OnTriggerExit2D(Collider2D collider2D)
-    {
-        if (collider2D.gameObject.CompareTag("Ground"))
-        { 
-            transform.localScale = new Vector2(-Mathf.Sign(transform.localScale.x), transform.localScale.y);
         }
     }
 

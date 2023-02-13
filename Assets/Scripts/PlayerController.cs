@@ -2,23 +2,29 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     public GameObject LevelStart;
     private Animator animator;
-    private BoxCollider2D Collider;
     private Rigidbody2D Body;
     public float speed;
     public float jump;
     private float horizontal;
     private float vertical;
     private bool IsGrounded;
-    
+    public GameObject[] Heart;
+    private int Lives = 3;
+
+    private IEnumerator Delay(float sec)
+    {
+        yield return new WaitForSeconds(sec);
+    }
+
     void Awake()
     {
         animator = GetComponent<Animator>();
-        Collider = GetComponent<BoxCollider2D>();
         Body = GetComponent<Rigidbody2D>();
     }
 
@@ -111,12 +117,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if(collision.gameObject.GetComponent<EnemyController>() != null)
+        {
+            animator.SetBool("Hurt", false);
+        }
+    }
+
     //Death Function
     private void Death()
     {
         Debug.Log("You Died!");
-        Vector2 startLocation = LevelStart.transform.position;
-        transform.position = startLocation;
+        SceneManager.LoadScene(0);
     }
 
     //
@@ -126,10 +139,19 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Picked up a Key!");
     }
 
-    public void KillPlayer()
+    public void DamagePlayer()
     {
-        animator.SetBool("Dead", true);
-        Death();
+        Lives--;
+        if (Lives == 0)
+        {
+            animator.SetTrigger("Dead");
+            StartCoroutine(Delay(2f));
+            Death();
+        }
+        animator.SetTrigger("Hurt");
+        Heart[Lives].SetActive(false);
+       
+        
     }
 
 }
