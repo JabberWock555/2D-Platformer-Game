@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     public float speed;
     public float jump;
     private float horizontal;
-    private float vertical;
+    private bool vertical;
     private bool IsGrounded;
     public GameObject[] Heart;
     private int Lives = 3;
@@ -33,9 +33,10 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
          horizontal = Input.GetAxisRaw("Horizontal");
-         vertical = Input.GetAxisRaw("Vertical");
-        PlayMovementAnimation(horizontal, vertical);
-        MoveCharacter(horizontal, vertical);
+         vertical = Input.GetButtonDown("Jump");
+         VerticalMovement(vertical);
+         HorizontalMovement(horizontal);
+
         // Death Condition
         if(transform.position.y < -10f)
         { Death();}
@@ -47,8 +48,54 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    private void PlayMovementAnimation(float horizontal, float vertical)
+    private void VerticalMovement(bool vertical)
     {
+        int JumpCount = 0;
+
+        //Jump Animation and Movement
+        if (JumpCount == 0 && IsGrounded && vertical)
+        {
+            JumpCount++;
+            animator.SetBool("JumpUp", true);
+            Body.AddForce(new Vector2(0, jump), ForceMode2D.Impulse);
+            
+        }
+        else if (!IsGrounded && !vertical)
+        {
+            animator.SetBool("JumpUp", false);
+            animator.SetBool("JumpDown", true);
+        }
+        else if (IsGrounded && !vertical)
+        {
+            animator.SetBool("JumpDown", false);
+        }
+
+        if (JumpCount == 1 && !IsGrounded && vertical)
+        {
+            animator.SetBool("JumpUp", true);
+            Body.AddForce(new Vector2(0, jump), ForceMode2D.Impulse);
+            JumpCount = 0 ;
+        }
+        //crouch Animation
+        if (Input.GetKeyDown("left ctrl"))
+            {
+                animator.SetBool("Crouch", true);
+            }
+            else if (Input.GetKeyUp("left ctrl"))
+            {
+                animator.SetBool("Crouch", false);
+            }
+        
+    }
+
+    private void HorizontalMovement(float horizontal)
+    {
+        //Horizontal Movement
+
+        Vector3 position = transform.position;
+        position.x += horizontal * speed * Time.deltaTime;
+        transform.position = position;
+
         //Run Animation and Flip
         animator.SetFloat("Speed", Mathf.Abs(horizontal));
         Vector3 scale = transform.localScale;
@@ -64,41 +111,6 @@ public class PlayerController : MonoBehaviour
         }
         transform.localScale = scale;
 
-        //Jump Animation
-        if (vertical > 0 )
-        {
-            animator.SetBool("Jump", true);
-        }
-        else
-        {
-            animator.SetBool("Jump", false);
-        }
-
-        //crouch Animation
-        if (Input.GetKeyDown("left ctrl"))
-        {
-            animator.SetBool("Crouch", true);
-        }
-        else if (Input.GetKeyUp("left ctrl"))
-        {
-            animator.SetBool("Crouch", false);
-        }
-
-    }
-
-    private void MoveCharacter(float horizontal, float vertical)
-    {
-        //Horizontal Movement
-
-        Vector3 position = transform.position;
-        position.x += horizontal * speed * Time.deltaTime;
-        transform.position = position;
-
-        //Jump
-        if(IsGrounded && vertical > 0.1f)
-        {
-            Body.AddForce(new Vector2(0, jump), ForceMode2D.Force);
-        }
     }
 
     //GroundCheck
