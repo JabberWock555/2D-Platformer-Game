@@ -7,15 +7,17 @@ using UnityEngine.SceneManagement;
 public class PlayerController : MonoBehaviour
 {
     public GameObject LevelStart;
-    private Animator animator;
-    private Rigidbody2D Body;
     public float speed;
     public float jump;
+    public GameObject[] Heart;
+
+    private Animator animator;
+    private Rigidbody2D Body;
     private float horizontal;
     private bool vertical;
     private bool IsGrounded;
-    public GameObject[] Heart;
     private int Lives = 3;
+    private bool DoubleJump;
 
     private IEnumerator Delay(float sec)
     {
@@ -33,7 +35,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
          horizontal = Input.GetAxisRaw("Horizontal");
-         vertical = Input.GetButtonDown("Jump");
+         vertical = Input.GetKeyDown(KeyCode.UpArrow);
          VerticalMovement(vertical);
          HorizontalMovement(horizontal);
 
@@ -50,18 +52,28 @@ public class PlayerController : MonoBehaviour
 
     private void VerticalMovement(bool vertical)
     {
-        int JumpCount = 0;
-
         //Jump Animation and Movement
-        if (JumpCount == 0 && IsGrounded && vertical)
+
+        if (IsGrounded)
         {
-            JumpCount++;
-            animator.SetBool("JumpUp", true);
-            Body.AddForce(new Vector2(0, jump), ForceMode2D.Impulse);
-            
+            DoubleJump = true;
+        }
+        if (vertical)
+        {
+            if (IsGrounded)
+            {
+                animator.SetBool("JumpUp", true);
+                Body.AddForce(new Vector2(0, jump), ForceMode2D.Impulse);
+            }
+            else if (!IsGrounded && DoubleJump)
+            {
+                animator.SetBool("JumpUp", true);
+                Body.AddForce(new Vector2(0, jump), ForceMode2D.Impulse);
+                DoubleJump = false;
+            }
         }
         else if (!IsGrounded && !vertical)
-        {
+        { 
             animator.SetBool("JumpUp", false);
             animator.SetBool("JumpDown", true);
         }
@@ -70,12 +82,8 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("JumpDown", false);
         }
 
-        if (JumpCount == 1 && !IsGrounded && vertical)
-        {
-            animator.SetBool("JumpUp", true);
-            Body.AddForce(new Vector2(0, jump), ForceMode2D.Impulse);
-            JumpCount = 0 ;
-        }
+        
+
         //crouch Animation
         if (Input.GetKeyDown("left ctrl"))
             {
@@ -90,8 +98,8 @@ public class PlayerController : MonoBehaviour
 
     private void HorizontalMovement(float horizontal)
     {
-        //Horizontal Movement
 
+        //Horizontal Movement
         Vector3 position = transform.position;
         position.x += horizontal * speed * Time.deltaTime;
         transform.position = position;
@@ -100,12 +108,12 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("Speed", Mathf.Abs(horizontal));
         Vector3 scale = transform.localScale;
 
-        if (horizontal < 0 && IsGrounded)
+        if (horizontal < 0)
         {
             scale.x = -1f * Mathf.Abs(scale.x);
 
         }
-        else if (horizontal > 0 && IsGrounded)
+        else if (horizontal > 0 )
         {
             scale.x = Mathf.Abs(scale.x);
         }
@@ -116,14 +124,14 @@ public class PlayerController : MonoBehaviour
     //GroundCheck
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Ground")) 
+        if (collision.gameObject.tag == ("Ground")) 
         {
             IsGrounded = true;
         }
     }
     void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.tag == ("Ground"))
         {
             IsGrounded = false;
         }
@@ -144,7 +152,7 @@ public class PlayerController : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
-    //
+    //Key Collection
     public void Pickup_Key()
     {
         ScoreDisplay.ScoreValue += 10;
