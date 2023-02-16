@@ -5,11 +5,12 @@ using UnityEngine.UI;
 
 public class ScoreDisplay : MonoBehaviour
 {
-    public static int ScoreValue = 0 ;
+    public static int ScoreValue;
     private Text Display;
 
     private void Awake()
     {
+        ScoreValue = 0;
         Display = gameObject.GetComponent<Text>();
     }
 

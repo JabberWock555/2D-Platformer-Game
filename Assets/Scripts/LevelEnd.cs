@@ -1,14 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class LevelEnd : MonoBehaviour
 {
+    public Button ResetButton;
+    private GameObject WinScreen;
+
+    private void Awake()
+    {
+        WinScreen = GameObject.Find("GameWinScreen");
+        WinScreen.SetActive(false);
+        ResetButton.onClick.AddListener(ResetLevel);
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.GetComponent<PlayerController>() != null)
+        if(ScoreDisplay.ScoreValue >= 50 && collision.gameObject.GetComponent<PlayerController>() != null)
         {
             Debug.Log("The Level has ended!");
+            WinScreen.SetActive(true);
         }
     }
+
+    private void ResetLevel()
+    {
+        Debug.Log("You Died!");
+        SceneManager.LoadScene(1);
+    }
+
+
 }
