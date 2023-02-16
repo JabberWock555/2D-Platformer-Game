@@ -8,10 +8,17 @@ using UnityEngine.UI;
 public class LobbyController : MonoBehaviour
 {
     public Button PlayButton;
+    public Button QuitButton;
 
     private void Awake()
     {
         PlayButton.onClick.AddListener(PlayGame);
+        QuitButton.onClick.AddListener(QuitGame);
+    }
+
+    private void QuitGame()
+    {
+        Application.Quit();
     }
 
     private void PlayGame()

@@ -37,11 +37,6 @@ public class PlayerController : MonoBehaviour
             VerticalMovement(vertical);
             HorizontalMovement(horizontal);
 
-            if (ScoreDisplay.ScoreValue >= 50)
-            {
-                Debug.Log("You Won");
-            }
-
             if (transform.position.y < -10f)
             {
                 DamagePlayer();
