@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,39 +7,41 @@ using UnityEngine.UI;
 
 public class LevelEnd : MonoBehaviour
 {
-    public Button ResetButton;
-    private GameObject WinScreen;
-    public Button QuitButton;
+    public Button NextLevelButton;
+    public int WinPoints;
+    private Scene ActiveScene;
 
     private void Awake()
     {
-        WinScreen = GameObject.Find("GameWinScreen");
-        WinScreen.SetActive(false);
-        ResetButton.onClick.AddListener(ResetLevel);
-        QuitButton.onClick.AddListener(QuitGame);
+        NextLevelButton.onClick.AddListener(NextLevel);
+        ActiveScene = SceneManager.GetActiveScene();
+        if (ActiveScene.buildIndex >= 3)
+        {
+            NextLevelButton.gameObject.SetActive(false);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(ScoreDisplay.ScoreValue >= 50 && collision.gameObject.GetComponent<PlayerController>() != null)
+        if(collision.gameObject.GetComponent<PlayerController>() != null)
         {
             PlayerController playerController = collision.gameObject.GetComponent<PlayerController>();
             Debug.Log("The Level has ended!");
-            WinScreen.SetActive(true);
             playerController.gameObject.GetComponent<SpriteRenderer>().enabled = false;
             playerController.enabled = false;
         }
     }
 
-    private void ResetLevel()
+    private void NextLevel()
     {
-        Debug.Log("You Died!");
-        SceneManager.LoadScene(1);
+        if (ActiveScene.buildIndex < 3)
+        {
+            SceneManager.LoadScene(ActiveScene.buildIndex + 1);
+        }
     }
 
-    private void QuitGame()
+    public void PlayerWin()
     {
-        Application.Quit();
+        gameObject.SetActive(true);
     }
-
 }

@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     public float jump;
     public GameObject[] Heart;
     public GameOverController gameOverController;
+    public LevelEnd LevelWinController;
 
     private Animator animator;
     private Rigidbody2D Body;
@@ -129,6 +130,15 @@ public class PlayerController : MonoBehaviour
         {
             IsGrounded = true;
         }
+
+        if (collision.gameObject.tag == "Portal")
+        {
+            if (ScoreDisplay.ScoreValue >= LevelWinController.WinPoints)
+            {
+                LevelWinController.PlayerWin();
+                enabled = false;
+            }
+        }
     }
 
     void OnTriggerExit2D(Collider2D collision)
@@ -147,7 +157,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-   
 
     //Key Collection
     public void Pickup_Key()
@@ -165,8 +174,11 @@ public class PlayerController : MonoBehaviour
             gameOverController.PlayerDied();
             enabled = false;
         }
-        animator.SetTrigger("Hurt");
-        Heart[Lives].SetActive(false);
+        else {
+            animator.SetTrigger("Hurt");
+            Heart[Lives].SetActive(false);
+        }
+        
        
         
     }
