@@ -12,7 +12,7 @@ public class LevelEnd : MonoBehaviour
     {
         NextLevelButton.onClick.AddListener(NextLevel);
         ActiveScene = SceneManager.GetActiveScene();
-        if (ActiveScene.buildIndex >= 3)
+        if (ActiveScene.buildIndex >= 5)
         {
             NextLevelButton.gameObject.SetActive(false);
         }
@@ -22,13 +22,14 @@ public class LevelEnd : MonoBehaviour
     {
         if (ActiveScene.buildIndex < 3)
         {
-            LevelManager.Instance.LevelComplete();
+            
             SceneManager.LoadScene(ActiveScene.buildIndex + 1);
         }
     }
 
     public void PlayerWin()
     {
+        LevelManager.Instance.LevelComplete();
         gameObject.SetActive(true);
     }
 }
