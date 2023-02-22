@@ -10,6 +10,7 @@ public class LevelEnd : MonoBehaviour
 
     private void Awake()
     {
+        SoundManager.Instance.Play(SoundEvents.PlayerWin);
         NextLevelButton.onClick.AddListener(NextLevel);
         ActiveScene = SceneManager.GetActiveScene();
         if (ActiveScene.buildIndex >= 5)
@@ -20,16 +21,16 @@ public class LevelEnd : MonoBehaviour
 
     private void NextLevel()
     {
-        if (ActiveScene.buildIndex < 3)
+        if (ActiveScene.buildIndex < 5)
         {
-            
+            SoundManager.Instance.Play(SoundEvents.ButtonClick);
             SceneManager.LoadScene(ActiveScene.buildIndex + 1);
         }
     }
 
     public void PlayerWin()
     {
-        LevelManager.Instance.LevelComplete();
+        Level_Manager.Instance.LevelComplete();
         gameObject.SetActive(true);
     }
 }

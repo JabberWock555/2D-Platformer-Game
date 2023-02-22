@@ -2,11 +2,12 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class LevelManager : MonoBehaviour
+public class Level_Manager : MonoBehaviour
 {
 
-    private static LevelManager instance;
-    public static LevelManager Instance { get { return instance; } }
+    private static Level_Manager instance;
+    public static Level_Manager Instance { get { return instance; } }
+
     public string[] Levels;
 
     private void Awake()

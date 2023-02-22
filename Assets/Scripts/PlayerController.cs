@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     private int Lives = 3;
     private bool DoubleJump;
 
-    void Awake()
+    private void Awake()
     {
         animator = GetComponent<Animator>();
         Body = GetComponent<Rigidbody2D>();
@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
 
     private void VerticalMovement(bool vertical)
     {
-        //Jump Animation and Movement
+        //Jump Animation, Movement, and Sound
 
         if (IsGrounded)
         {
@@ -64,23 +64,26 @@ public class PlayerController : MonoBehaviour
         {
             if (IsGrounded)
             {
+                SoundManager.Instance.Play(SoundEvents.PlayerJumpUp);
                 animator.SetBool("JumpUp", true);
                 Body.AddForce(new Vector2(0, jump), ForceMode2D.Impulse);
             }
             else if (!IsGrounded && DoubleJump)
             {
+                SoundManager.Instance.Play(SoundEvents.PlayerJumpUp);
                 animator.SetBool("JumpUp", true);
                 Body.AddForce(new Vector2(0, jump), ForceMode2D.Impulse);
                 DoubleJump = false;
             }
         }
         else if (!IsGrounded && !vertical)
-        { 
+        {
             animator.SetBool("JumpUp", false);
             animator.SetBool("JumpDown", true);
         }
         else if (IsGrounded && !vertical)
         {
+            SoundManager.Instance.Play(SoundEvents.PlayerLand);
             animator.SetBool("JumpDown", false);
         }
 
@@ -100,6 +103,11 @@ public class PlayerController : MonoBehaviour
 
     private void HorizontalMovement(float horizontal)
     {
+        //Sound
+        if (IsGrounded)
+        {
+            SoundManager.Instance.PlayerMovement(SoundEvents.PlayerRun);
+        }
 
         //Horizontal Movement
         Vector3 position = transform.position;
@@ -120,11 +128,10 @@ public class PlayerController : MonoBehaviour
             scale.x = Mathf.Abs(scale.x);
         }
         transform.localScale = scale;
-
     }
 
     //GroundCheck
-    void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == ("Ground")) 
         {
@@ -141,13 +148,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void OnTriggerExit2D(Collider2D collision)
+    private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.tag == ("Ground"))
         {
             IsGrounded = false;
         }
     }
+
 
     private void OnCollisionExit2D(Collision2D collision)
     {
@@ -165,16 +173,19 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Picked up a Key!");
     }
 
+    //Player Hurt and Death
     public void DamagePlayer()
     {
         Lives--;
         if (Lives <= 0)
         {
+            SoundManager.Instance.Play(SoundEvents.PlayerDeath);
             animator.SetTrigger("Dead");
             gameOverController.PlayerDied();
             enabled = false;
         }
         else {
+            SoundManager.Instance.Play(SoundEvents.PlayerHurt);
             animator.SetTrigger("Hurt");
             Heart[Lives].SetActive(false);
         }

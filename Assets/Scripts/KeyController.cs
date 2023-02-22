@@ -20,7 +20,7 @@ public class KeyController : MonoBehaviour
             playerController.Pickup_Key();
             animator.SetBool("Collected", true);
             StartCoroutine(End());
-            
+            SoundManager.Instance.Play(SoundEvents.KeyPickup);
         }
     }
 
