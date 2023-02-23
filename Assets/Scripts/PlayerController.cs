@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-
+    public GameObject LevelStart;
     public Animator animator;
     private BoxCollider2D Collider;
     private Rigidbody2D Body;
@@ -26,31 +26,31 @@ public class PlayerController : MonoBehaviour
          vertical = Input.GetAxisRaw("Vertical");
         PlayMovementAnimation(horizontal, vertical);
         MoveCharacter(horizontal, vertical);
+        // Death Condition
+        if(transform.position.y < -10f)
+        { Death();}
     }
 
-     void FixedUpdate()
-    {
-        
-    }
+    
     private void PlayMovementAnimation(float horizontal, float vertical)
     {
         animator.SetFloat("Speed", Mathf.Abs(horizontal));
         Vector3 scale = transform.localScale;
 
         //Run
-        if (horizontal < 0)
+        if (horizontal < 0 && IsGrounded)
         {
             scale.x = -1f * Mathf.Abs(scale.x);
 
         }
-        else if (horizontal > 0)
+        else if (horizontal > 0 && IsGrounded)
         {
             scale.x = Mathf.Abs(scale.x);
         }
         transform.localScale = scale;
 
         //Jump
-        if (vertical > 0)
+        if (vertical > 0 )
         {
             animator.SetBool("Jump", true);
             
@@ -76,6 +76,7 @@ public class PlayerController : MonoBehaviour
     private void MoveCharacter(float horizontal, float vertical)
     {
         //Horizontal Movement
+
         Vector3 position = transform.position;
         position.x += horizontal * speed * Time.deltaTime;
         transform.position = position;
@@ -89,16 +90,23 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if( collision.gameObject.tag == "Platform")
+        if (collision.gameObject.CompareTag("Platform")) 
         {
             IsGrounded = true;
         }
     }
     void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Platform")
+        if (collision.gameObject.CompareTag("Platform"))
         {
             IsGrounded = false;
         }
+    }
+
+    private void Death()
+    {
+        Debug.Log("You Died!");
+        Vector2 startLocation = LevelStart.transform.position;
+        transform.position = startLocation;
     }
 }
