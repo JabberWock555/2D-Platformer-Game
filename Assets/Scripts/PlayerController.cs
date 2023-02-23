@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,6 +9,7 @@ public class PlayerController : MonoBehaviour
     public float speed;
     public float jump;
     public GameObject[] Heart;
+    public GameOverController gameOverController;
 
     private Animator animator;
     private Rigidbody2D Body;
@@ -19,36 +19,37 @@ public class PlayerController : MonoBehaviour
     private int Lives = 3;
     private bool DoubleJump;
 
-    private IEnumerator Delay(float sec)
-    {
-        yield return new WaitForSeconds(sec);
-    }
-
     void Awake()
     {
         animator = GetComponent<Animator>();
         Body = GetComponent<Rigidbody2D>();
+        StartLevel();
     }
 
 
     // Update is called once per frame
     void Update()
     {
-         horizontal = Input.GetAxisRaw("Horizontal");
-         vertical = Input.GetKeyDown(KeyCode.UpArrow);
-         VerticalMovement(vertical);
-         HorizontalMovement(horizontal);
-
-        // Death Condition
-        if(transform.position.y < -10f)
-        { Death();}
-
-        if(ScoreDisplay.ScoreValue == 50)
+        if(Lives > 0)
         {
-            Debug.Log("You Won");
+            horizontal = Input.GetAxisRaw("Horizontal");
+            vertical = Input.GetButtonDown("Vertical");
+            VerticalMovement(vertical);
+            HorizontalMovement(horizontal);
+
+            if (transform.position.y < -10f)
+            {
+                DamagePlayer();
+                StartLevel();
+            }
         }
     }
 
+    private void StartLevel()
+    {
+        Vector2 StartLocation = LevelStart.transform.position;
+        transform.position = StartLocation;
+    }
 
     private void VerticalMovement(bool vertical)
     {
@@ -129,6 +130,7 @@ public class PlayerController : MonoBehaviour
             IsGrounded = true;
         }
     }
+
     void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.tag == ("Ground"))
@@ -145,12 +147,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    //Death Function
-    private void Death()
-    {
-        Debug.Log("You Died!");
-        SceneManager.LoadScene(0);
-    }
+   
 
     //Key Collection
     public void Pickup_Key()
@@ -162,11 +159,11 @@ public class PlayerController : MonoBehaviour
     public void DamagePlayer()
     {
         Lives--;
-        if (Lives == 0)
+        if (Lives <= 0)
         {
             animator.SetTrigger("Dead");
-            StartCoroutine(Delay(2f));
-            Death();
+            gameOverController.PlayerDied();
+            enabled = false;
         }
         animator.SetTrigger("Hurt");
         Heart[Lives].SetActive(false);

@@ -41,7 +41,7 @@ public class EnemyController : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collider2D)
     {
-        if (collider2D.gameObject.CompareTag("Ground"))
+        if (collider2D.gameObject.tag == "Ground")
         { 
             transform.localScale = new Vector2(-Mathf.Sign(transform.localScale.x), transform.localScale.y);
         }
