@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public GameObject LevelStart;
     public float speed;
     public float jump;
     public GameObject[] Heart;
+    public GameObject LevelStart;
     public GameOverController gameOverController;
     public LevelEnd LevelWinController;
 
@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        followPlayer();
         if(Lives > 0)
         {
             horizontal = Input.GetAxisRaw("Horizontal");
@@ -194,4 +195,9 @@ public class PlayerController : MonoBehaviour
         
     }
 
+    private void followPlayer()
+    {
+        Vector3 cameraPosition = new(transform.position.x, (transform.position.y + 2f), -10f);
+        Camera.main.transform.position = cameraPosition;
+    }
 }

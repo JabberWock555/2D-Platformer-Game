@@ -4,12 +4,16 @@ using UnityEngine.UI;
 
 public class LevelEnd : MonoBehaviour
 {
+    private ParticleSystem Fireflies;
     public Button NextLevelButton;
     public int WinPoints;
     private Scene ActiveScene;
 
+    [System.Obsolete]
     private void Awake()
     {
+        Fireflies = FindObjectOfType<ParticleSystem>();
+        Fireflies.Play();
         SoundManager.Instance.Play(SoundEvents.PlayerWin);
         NextLevelButton.onClick.AddListener(NextLevel);
         ActiveScene = SceneManager.GetActiveScene();
