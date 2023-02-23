@@ -2,38 +2,43 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     public GameObject LevelStart;
-    public Animator animator;
-    private BoxCollider2D Collider;
-    private Rigidbody2D Body;
     public float speed;
     public float jump;
+    public GameObject[] Heart;
+
+    private Animator animator;
+    private Rigidbody2D Body;
     private float horizontal;
-    private float vertical;
+    private bool vertical;
     private bool IsGrounded;
-    
-    void Awake()
+    private int Lives = 3;
+    private bool DoubleJump;
+
+    private IEnumerator Delay(float sec)
     {
-        Collider = gameObject.GetComponent<BoxCollider2D>();
-        Body = gameObject.GetComponent<Rigidbody2D>();
+        yield return new WaitForSeconds(sec);
     }
 
-    public void Pickup_Key()
+    void Awake()
     {
-        ScoreDisplay.ScoreValue += 10;
-        Debug.Log("Picked up a Key!");
+        animator = GetComponent<Animator>();
+        Body = GetComponent<Rigidbody2D>();
     }
+
 
     // Update is called once per frame
     void Update()
     {
          horizontal = Input.GetAxisRaw("Horizontal");
-         vertical = Input.GetAxisRaw("Vertical");
-        PlayMovementAnimation(horizontal, vertical);
-        MoveCharacter(horizontal, vertical);
+         vertical = Input.GetKeyDown(KeyCode.UpArrow);
+         VerticalMovement(vertical);
+         HorizontalMovement(horizontal);
+
         // Death Condition
         if(transform.position.y < -10f)
         { Death();}
@@ -44,75 +49,99 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    
-    private void PlayMovementAnimation(float horizontal, float vertical)
+
+    private void VerticalMovement(bool vertical)
     {
+        //Jump Animation and Movement
+
+        if (IsGrounded)
+        {
+            DoubleJump = true;
+        }
+        if (vertical)
+        {
+            if (IsGrounded)
+            {
+                animator.SetBool("JumpUp", true);
+                Body.AddForce(new Vector2(0, jump), ForceMode2D.Impulse);
+            }
+            else if (!IsGrounded && DoubleJump)
+            {
+                animator.SetBool("JumpUp", true);
+                Body.AddForce(new Vector2(0, jump), ForceMode2D.Impulse);
+                DoubleJump = false;
+            }
+        }
+        else if (!IsGrounded && !vertical)
+        { 
+            animator.SetBool("JumpUp", false);
+            animator.SetBool("JumpDown", true);
+        }
+        else if (IsGrounded && !vertical)
+        {
+            animator.SetBool("JumpDown", false);
+        }
+
+        
+
+        //crouch Animation
+        if (Input.GetKeyDown("left ctrl"))
+            {
+                animator.SetBool("Crouch", true);
+            }
+            else if (Input.GetKeyUp("left ctrl"))
+            {
+                animator.SetBool("Crouch", false);
+            }
+        
+    }
+
+    private void HorizontalMovement(float horizontal)
+    {
+
+        //Horizontal Movement
+        Vector3 position = transform.position;
+        position.x += horizontal * speed * Time.deltaTime;
+        transform.position = position;
+
+        //Run Animation and Flip
         animator.SetFloat("Speed", Mathf.Abs(horizontal));
         Vector3 scale = transform.localScale;
 
-        //Run
-        if (horizontal < 0 && IsGrounded)
+        if (horizontal < 0)
         {
             scale.x = -1f * Mathf.Abs(scale.x);
 
         }
-        else if (horizontal > 0 && IsGrounded)
+        else if (horizontal > 0 )
         {
             scale.x = Mathf.Abs(scale.x);
         }
         transform.localScale = scale;
 
-        //Jump
-        if (vertical > 0 )
-        {
-            animator.SetBool("Jump", true);
-            
-        }
-        else { animator.SetBool("Jump", false); }
-
-        //crouch
-        if (Input.GetKeyDown("left ctrl"))
-        {
-            animator.SetBool("Crouch", true);
-            Collider.size = new Vector2(0.6f, 1.2f);
-            Collider.offset = new Vector2(-0.05f, 0.6f);
-
-        }
-        else if (Input.GetKeyUp("left ctrl"))
-        {
-            animator.SetBool("Crouch", false);
-            Collider.size = new Vector2(0.6f, 2f);
-            Collider.offset = new Vector2(0.05f, 0.97f);
-        }
     }
 
-    private void MoveCharacter(float horizontal, float vertical)
-    {
-        //Horizontal Movement
-
-        Vector3 position = transform.position;
-        position.x += horizontal * speed * Time.deltaTime;
-        transform.position = position;
-
-        //Jump
-        if(IsGrounded && vertical > 0.1f)
-        {
-            Body.AddForce(new Vector2(0, jump), ForceMode2D.Force);
-        }
-    }
-
+    //GroundCheck
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Platform")) 
+        if (collision.gameObject.tag == ("Ground")) 
         {
             IsGrounded = true;
         }
     }
     void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Platform"))
+        if (collision.gameObject.tag == ("Ground"))
         {
             IsGrounded = false;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if(collision.gameObject.GetComponent<EnemyController>() != null)
+        {
+            animator.SetBool("Hurt", false);
         }
     }
 
@@ -120,9 +149,29 @@ public class PlayerController : MonoBehaviour
     private void Death()
     {
         Debug.Log("You Died!");
-        Vector2 startLocation = LevelStart.transform.position;
-        transform.position = startLocation;
+        SceneManager.LoadScene(0);
     }
 
-    
+    //Key Collection
+    public void Pickup_Key()
+    {
+        ScoreDisplay.ScoreValue += 10;
+        Debug.Log("Picked up a Key!");
+    }
+
+    public void DamagePlayer()
+    {
+        Lives--;
+        if (Lives == 0)
+        {
+            animator.SetTrigger("Dead");
+            StartCoroutine(Delay(2f));
+            Death();
+        }
+        animator.SetTrigger("Hurt");
+        Heart[Lives].SetActive(false);
+       
+        
+    }
+
 }

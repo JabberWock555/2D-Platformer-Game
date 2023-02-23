@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ScoreDisplay : MonoBehaviour
 {
-    public static int ScoreValue;
+    public static int ScoreValue = 0 ;
     private Text Display;
 
     private void Awake()
