@@ -1,14 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LobbyController : MonoBehaviour
 {
     public Button PlayButton;
     public Button QuitButton;
+    public GameObject LevelSelector;
 
     private void Awake()
     {
@@ -23,6 +20,6 @@ public class LobbyController : MonoBehaviour
 
     private void PlayGame()
     {
-        SceneManager.LoadScene(1);
+        LevelSelector.SetActive(true);
     }
 }
