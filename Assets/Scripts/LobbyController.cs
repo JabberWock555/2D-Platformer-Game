@@ -15,11 +15,13 @@ public class LobbyController : MonoBehaviour
 
     private void QuitGame()
     {
+        SoundManager.Instance.Play(SoundEvents.ButtonClick);
         Application.Quit();
     }
 
     private void PlayGame()
     {
+        SoundManager.Instance.Play(SoundEvents.ButtonClick);
         LevelSelector.SetActive(true);
     }
 }

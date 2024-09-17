@@ -29,6 +29,7 @@ public class EnemyController : MonoBehaviour
             animator.SetBool("Attack",true);
             EnemyBody.velocity = new Vector2(0, 0);
             playerController.DamagePlayer();
+            SoundManager.Instance.Play(SoundEvents.EnemyAttack);
         }
         
     }
